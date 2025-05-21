@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #ctx {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="ctx" width="1920" height="1080"></canvas>
+    <script>
+        const c = document.getElementById("ctx");
+
+        c.width = innerWidth * devicePixelRatio;
+        c.height = innerHeight * devicePixelRatio;
+        c.style.width = `${innerWidth}px`;
+        c.style.height = `${innerHeight}px`;
+
+        document.addEventListener("resize", () => {
+            c.width = innerWidth * devicePixelRatio;
+            c.height = innerHeight * devicePixelRatio;
+            c.style.width = `${innerWidth}px`;
+            c.style.height = `${innerHeight}px`;
+        })
+    </script>
+    <script src="main.js"></script>
+</body>
+
+</html>

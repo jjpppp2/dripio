@@ -1,0 +1,8 @@
+-cp src/client/src
+-main Main
+-js src/client/bin/js/main.js
+-lib json2object
+-lib msgpack-haxe
+
+# when generating for the server
+# -D server

@@ -1,0 +1,5 @@
+-cp src/server/src
+-main Server
+-hl src/server/bin/server.hl
+-lib hxWebSockets
+-lib msgpack-haxe
