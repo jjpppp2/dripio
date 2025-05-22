@@ -1,11 +1,8 @@
 package;
 
-import js.Browser;
 import classes.Render;
 import classes.Game;
 import packets.OutgoingPackets;
-import js.html.AddEventListenerOptions;
-import js.html.KeyboardEvent;
 
 class Main {
     public static var instance:Main;

@@ -1,22 +1,21 @@
 package classes;
 
+import hx.ws.Types.MessageType;
 import packets.OutgoingPackets;
-import js.html.ErrorEvent;
 import packets.IncomingPackets.decodePacket;
 import haxe.io.Bytes;
-import js.lib.ArrayBuffer;
-import js.html.MessageEvent;
-import js.html.WebSocket;
-import js.Browser.alert;
+import haxe.io.Bytes;
+import hx.ws.Log;
+import hx.ws.WebSocket;
 
 class Game {
 	public var ws:WebSocket;
 	// public var players:Array<Player>;
 	// public var myPlayer:Player;
-	public final document:Any;
 	public var timeSinceGameUpdate:Float;
 
 	public function new() {
+		Log.mask = Log.INFO | Log.DEBUG | Log.DATA;
 		this.ws = new WebSocket("ws://localhost:5000"); // ("wss://quiver-descriptive-sight.glitch.me");
 		this.ws.binaryType = cast "arraybuffer";
 
@@ -24,8 +23,6 @@ class Game {
 		this.ws.onmessage = this.onmessage;
 		this.ws.onerror = this.onerror;
 		this.ws.onclose = this.onclose;
-
-		this.document = js.Browser.document;
 	}
 
 	private function onopen() {
@@ -38,23 +35,31 @@ class Game {
 		encodePacket(OutgoingPackets.Spawn, ["ok"]);
 	}
 
-	private function onerror(error:ErrorEvent) {
-		alert('Error encountered while trying to connect to the game. Try reloading.');
+	private function onerror(error:String) {
+		//#if js
+		//alert('Error encountered while trying to connect to the game. Try reloading.');
+		//#end
 	}
 
 	private function onclose() {}
 
-	private function onmessage(e:MessageEvent) {
-		final buffer:ArrayBuffer = cast e.data;
-		final bytes = Bytes.ofData(buffer);
-		final args = decodePacket(bytes);
+	private function onmessage(msg:MessageType) {
+		switch (msg) {
+			case BytesMessage(data):
+				final bytes:haxe.io.Bytes = cast data;
+				final args = decodePacket(bytes);
 
-		switch (args) {
-			case Ping:
-				this.Packets_Ping();
-			case _:
-				trace("unknown packet inbound!!");
+				switch (args) {
+					case Ping:
+						this.Packets_Ping();
+					case _:
+						trace("unknown packet inbound!!");
+				}
+			
+			case StrMessage(text):
+				trace("waht????" + text);
 		}
+		
 	}
 
 	private function Packets_Ping() {

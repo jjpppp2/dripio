@@ -1,8 +1,5 @@
 package classes;
 
-import js.html.CanvasRenderingContext2D;
-import js.html.CanvasElement;
-import js.Browser;
 import src.shared.Config;
 import hxd.App;
 import h2d.Graphics;
@@ -22,8 +19,6 @@ class Render extends App {
 	public function new() {
 		super();
 		this.camera = new Camera();
-
-		// Browser.window.requestAnimationFrame(this.render);
 	}
 
 	override function init() {
@@ -86,7 +81,7 @@ class Render extends App {
 
 		// winter biome
 		background.beginFill(0xFCFCFD);
-		background.drawRect(0, 0, Config.SnowBiomeY, Config.MapSize);
+		background.drawRect(0, 0, Config.MapSize, Config.SnowBiomeY);
 		background.endFill();
 
 		// grasslands biome

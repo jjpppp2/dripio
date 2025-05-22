@@ -1,9 +1,14 @@
 -cp src/client/src
 -main Main
--js src/client/bin/js/main.js
+-hl src/client/bin/hl/main.hl
 -lib json2object
 -lib msgpack-haxe
 -lib heaps
+-lib closure
+-lib haxeui-core
+-lib haxeui-html5
+-lib hxWebSockets
+-lib hlsdl
 
 # when generating for the server
 # -D server
