@@ -11,13 +11,13 @@ import js.Browser.alert;
 
 class Game {
 	public var ws:WebSocket;
-	//public var players:Array<Player>;
-	//public var myPlayer:Player;
+	// public var players:Array<Player>;
+	// public var myPlayer:Player;
 	public final document:Any;
 	public var timeSinceGameUpdate:Float;
 
 	public function new() {
-		this.ws = new WebSocket("wss://quiver-descriptive-sight.glitch.me");
+		this.ws = new WebSocket("ws://localhost:5000"); // ("wss://quiver-descriptive-sight.glitch.me");
 		this.ws.binaryType = cast "arraybuffer";
 
 		this.ws.onopen = this.onopen;
@@ -31,6 +31,10 @@ class Game {
 	private function onopen() {
 		trace("WS OPENED");
 
+		encodePacket(OutgoingPackets.Spawn, ["ok"]);
+		encodePacket(OutgoingPackets.Spawn, ["ok"]);
+		encodePacket(OutgoingPackets.Spawn, ["ok"]);
+		encodePacket(OutgoingPackets.Spawn, ["ok"]);
 		encodePacket(OutgoingPackets.Spawn, ["ok"]);
 	}
 

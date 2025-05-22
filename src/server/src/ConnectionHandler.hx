@@ -3,6 +3,7 @@ package;
 import hx.ws.SocketImpl;
 import hx.ws.WebSocketHandler;
 import hx.ws.Types;
+import haxe.io.Bytes;
 import org.msgpack.MsgPack;
 
 class ConnectionHandler extends WebSocketHandler {
@@ -18,15 +19,30 @@ class ConnectionHandler extends WebSocketHandler {
 		}
 
 		onmessage = function(message:MessageType) {
-			trace("ok");
-			/*
 			switch (message) {
-				case BytesMessage(content):
-					trace(content.readAllAvailableBytes());
+				case BytesMessage(buffer):
+
+					// figure out way to simplify later (no clue what its doing)
+					var bytesList = new haxe.io.BytesBuffer();
+					while (buffer.available > 0) {
+						var b = buffer.readByte();
+						bytesList.addByte(b);
+					}
+					var bytes = bytesList.getBytes();
+					var data = MsgPack.decode(bytes);
+
+					trace(data);
 				case StrMessage(content):
-					var str = "echo: " + content;
-					trace(str);
-					send(str);
+					trace("what?? " + content);
+			}
+			/*
+				switch (message) {
+					case BytesMessage(content):
+						trace(content.readAllAvailableBytes());
+					case StrMessage(content):
+						var str = "echo: " + content;
+						trace(str);
+						send(str);
 			}*/
 		}
 

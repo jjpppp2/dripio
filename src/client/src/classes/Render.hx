@@ -4,90 +4,127 @@ import js.html.CanvasRenderingContext2D;
 import js.html.CanvasElement;
 import js.Browser;
 import src.shared.Config;
+import hxd.App;
+import h2d.Graphics;
+import hxd.Key;
 
-class Render {
+class Render extends App {
 	private var camera:Camera;
 	private var delta:Float;
 	private var lastFrameCall:Float;
 	private var xOffset:Float;
 	private var yOffset:Float;
-	private final canvas:CanvasElement;
-	private final context:CanvasRenderingContext2D;
+	private var zoom:Float;
+
+	private var background:Graphics;
+	private var grid:Graphics;
 
 	public function new() {
+		super();
 		this.camera = new Camera();
-		final doc = js.Browser.document;
-		this.canvas = cast doc.getElementById("ctx");
-		this.context = canvas.getContext2d();
 
-		Browser.window.requestAnimationFrame(this.render);
+		// Browser.window.requestAnimationFrame(this.render);
 	}
 
-	private function render(date:Float):Void {
-		this.delta = (this.lastFrameCall ?? date) - date;
-		this.lastFrameCall = date;
-
-		this.xOffset = this.camera.x;
-		this.yOffset = this.camera.y;
-
+	override function init() {
+		this.background = new Graphics(s2d);
 		this.renderBackground();
+
+		this.grid = new Graphics(s2d);
 		this.renderGridLines();
 	}
 
-	private function renderPlayers() {
-		//var alpha:Float = Game.timeSinceGameUpdate / Config.ServerUpdateRate;
+	override private function update(date:Float):Void {
+		/*
+			this.delta = (this.lastFrameCall ?? date) - date;
+			this.lastFrameCall = date;
 
-		//var x = lerp(oldx, currx, alpha);
+			this.xOffset = this.camera.x;
+			this.yOffset = this.camera.y;
+
+			this.renderBackground();
+			this.renderGridLines();
+		 */
+
+		this.delta = (this.lastFrameCall ?? date) - date;
+		this.lastFrameCall = date;
+
+		if (Key.isDown(Key.W))
+			camera.y -= 50;
+		if (Key.isDown(Key.S))
+			camera.y += 50;
+		if (Key.isDown(Key.A))
+			camera.x -= 50;
+		if (Key.isDown(Key.D))
+			camera.x += 50;
+
+		background.x = -this.camera.x;
+		background.y = -this.camera.y;
+
+		grid.x = -this.camera.x;
+		grid.y = -this.camera.y;
+
+		//trace(delta);
+	}
+
+	private function renderPlayers() {
+		// var alpha:Float = Game.timeSinceGameUpdate / Config.ServerUpdateRate;
+
+		// var x = lerp(oldx, currx, alpha);
 	}
 
 	private function renderBackground() {
-		// render the boundaries (just draw on whole screen)
-		context.fillStyle = "#232323";
-		context.fillRect(0, 0, Browser.window.innerWidth, Browser.window.innerHeight);
+		background.clear();
 
-		context.save();
-		context.translate(-xOffset, -yOffset);
+		// render the boundaries (just draw on whole screen)
+		// background.beginFill("#232323");
+		// background.fillRect(0, 0, Browser.window.innerWidth, Browser.window.innerHeight);
+		// background.endFill();
+
+		// context.save();
+		// context.translate(-xOffset, -yOffset);
 
 		// winter biome
-		context.fillStyle = "#fcfcfd";
-		context.fillRect(0, 0, Config.SnowBiomeY, Config.MapSize);
+		background.beginFill(0xFCFCFD);
+		background.drawRect(0, 0, Config.SnowBiomeY, Config.MapSize);
+		background.endFill();
 
 		// grasslands biome
-		context.fillStyle = "#77e261";
-		context.fillRect(0, Config.SnowBiomeY, Config.MapSize, (Config.MapSize - Config.SnowBiomeY));
+		background.beginFill(0x77E261);
+		background.drawRect(0, Config.SnowBiomeY, Config.MapSize, (Config.MapSize - Config.SnowBiomeY));
+		background.endFill();
 
 		// overlay to darken colors
-		context.fillStyle = "rgba(35, 20, 80, 0.3)";
-		context.fillRect(0, 0, Config.MapSize, Config.MapSize);
-		context.restore();
+		background.beginFill(0x231450, 0.3);
+		background.drawRect(0, 0, Config.MapSize, Config.MapSize);
+		background.endFill();
 	}
 
 	private function renderGridLines() {
-		context.save();
-		context.translate(-xOffset, -yOffset);
-		context.beginPath();
-		context.lineWidth = 4;
-		context.globalAlpha = 0.06;
-		context.strokeStyle = "#000";
+		// context.save();
+		// context.translate(-xOffset, -yOffset);
+
+		grid.clear();
+		grid.lineStyle(4, 0x000000, 0.06);
 
 		var x = 0;
 		while (x < Config.MapSize) {
-			context.moveTo(0, x);
-			context.lineTo(Config.MapSize, x);
+			grid.moveTo(0, x);
+			grid.lineTo(Config.MapSize, x);
 
 			x += Config.GridBoxSize;
 		}
 
 		var y = 0;
 		while (y < Config.MapSize) {
-			context.moveTo(y, 0);
-			context.lineTo(y, Config.MapSize);
+			grid.moveTo(y, 0);
+			grid.lineTo(y, Config.MapSize);
 
 			y += Config.GridBoxSize;
 		}
 
-		context.stroke();
-		context.restore();
+		// context.stroke();
+		// context.restore();
 	}
 
 	private function lerp(a:Float, b:Float, t:Float):Float {
@@ -96,31 +133,11 @@ class Render {
 }
 
 class Camera {
-	@:isVar
-	public var x(get, set):Float;
-	@:isVar
-	public var y(get, set):Float;
+	public var x(default, default):Float;
+	public var y(default, default):Float;
 
 	public function new() {
-		this.x = -1920.0 / 2.0 + 700;
-		this.y = -1080.0 / 2.0 + 700;
-	}
-
-	function get_y():Float {
-		return this.y;
-	}
-
-	function set_y(y:Float):Float {
-		this.y = y;
-		return y;
-	}
-
-	function get_x():Float {
-		return this.x;
-	}
-
-	function set_x(x:Float):Float {
-		this.x = x;
-		return x;
+		x = -1920 / 2 + 700;
+		y = -1080 / 2 + 700;
 	}
 }
