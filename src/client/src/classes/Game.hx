@@ -1,8 +1,8 @@
-package classes;
+package src.client.src.classes;
 
+import src.client.src.packets.IncomingPackets;
+import src.client.src.packets.OutgoingPackets;
 import hx.ws.Types.MessageType;
-import packets.OutgoingPackets;
-import packets.IncomingPackets.decodePacket;
 import haxe.io.Bytes;
 import haxe.io.Bytes;
 import hx.ws.Log;
@@ -28,17 +28,15 @@ class Game {
 	private function onopen() {
 		trace("WS OPENED");
 
-		encodePacket(OutgoingPackets.Spawn, ["ok"]);
-		encodePacket(OutgoingPackets.Spawn, ["ok"]);
-		encodePacket(OutgoingPackets.Spawn, ["ok"]);
-		encodePacket(OutgoingPackets.Spawn, ["ok"]);
-		encodePacket(OutgoingPackets.Spawn, ["ok"]);
+		sendPacket(OutgoingPackets.Spawn, ["ok"]);
+		sendPacket(OutgoingPackets.Spawn, ["ok"]);
+		sendPacket(OutgoingPackets.Spawn, ["ok"]);
+		sendPacket(OutgoingPackets.Spawn, ["ok"]);
+		sendPacket(OutgoingPackets.Spawn, ["ok"]);
 	}
 
 	private function onerror(error:String) {
-		//#if js
 		//alert('Error encountered while trying to connect to the game. Try reloading.');
-		//#end
 	}
 
 	private function onclose() {}

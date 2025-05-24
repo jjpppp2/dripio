@@ -1,4 +1,4 @@
-package packets;
+package src.client.src.packets;
 
 import haxe.io.Bytes;
 import org.msgpack.MsgPack;

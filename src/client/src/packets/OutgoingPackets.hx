@@ -1,4 +1,4 @@
-package packets;
+package src.client.src.packets;
 
 import org.msgpack.MsgPack;
 import haxe.io.Bytes;
@@ -11,7 +11,7 @@ enum OutgoingPackets {
     Ping();
 }
 
-function encodePacket(type:OutgoingPackets, args:Array<Dynamic>):Void {
+function sendPacket(type:OutgoingPackets, args:Array<Dynamic>):Void {
     final data:Dynamic = [type.getName(), args]; // convert enum to string name
     final encoded:Bytes = MsgPack.encode(data);
     Main.instance.game.ws.send(encoded);

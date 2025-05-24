@@ -1,9 +1,10 @@
-package classes;
+package src.client.src.classes;
 
 import src.shared.Config;
 import hxd.App;
 import h2d.Graphics;
 import hxd.Key;
+import h2d.Text;
 
 class Render extends App {
 	private var camera:Camera;
@@ -15,6 +16,10 @@ class Render extends App {
 
 	private var background:Graphics;
 	private var grid:Graphics;
+	//private var playersC:Graphics;
+
+	private var font:Any;
+	private var fpsText:Text;
 
 	public function new() {
 		super();
@@ -27,6 +32,16 @@ class Render extends App {
 
 		this.grid = new Graphics(s2d);
 		this.renderGridLines();
+
+		//this.playersC = new Graphics(s2d);
+		//this.renderPlayers();
+
+		this.font = hxd.res.DefaultFont.get();
+
+		this.fpsText = new Text(font, s2d);
+		this.fpsText.x = 10;
+		this.fpsText.y = 10;
+		this.fpsText.text = "FPS: --";
 	}
 
 	override private function update(date:Float):Void {
@@ -41,8 +56,14 @@ class Render extends App {
 			this.renderGridLines();
 		 */
 
-		this.delta = (this.lastFrameCall ?? date) - date;
-		this.lastFrameCall = date;
+		if (lastFrameCall == 0) lastFrameCall = date;
+		delta = (date - lastFrameCall);
+		lastFrameCall = date;
+
+		if (delta > 0) {
+			var fps = Std.int(1000.0 / (delta));
+			fpsText.text = "FPS: " + fps;
+		}
 
 		if (Key.isDown(Key.W))
 			camera.y -= 50;
@@ -59,7 +80,7 @@ class Render extends App {
 		grid.x = -this.camera.x;
 		grid.y = -this.camera.y;
 
-		//trace(delta);
+		// trace(delta);
 	}
 
 	private function renderPlayers() {
@@ -120,6 +141,10 @@ class Render extends App {
 
 		// context.stroke();
 		// context.restore();
+	}
+
+	private function renderPlayers() {
+		
 	}
 
 	private function lerp(a:Float, b:Float, t:Float):Float {

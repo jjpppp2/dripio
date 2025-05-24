@@ -1,8 +1,7 @@
-package;
+package client;
 
-import classes.Render;
-import classes.Game;
-import packets.OutgoingPackets;
+import src.client.src.classes.Render;
+import src.client.src.classes.Game;
 
 class Main {
     public static var instance:Main;

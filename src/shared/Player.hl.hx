@@ -1,6 +1,6 @@
-package shared;
+package src.shared;
 
-import shared.Config;
+import src.shared.Config;
 
 class Player {
 	public var sid:Int;
