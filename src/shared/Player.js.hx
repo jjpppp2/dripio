@@ -1,17 +1,26 @@
-package shared;
+package src.shared;
 
-import shared.Config;
+import src.shared.Config;
 
 class Player {
 	public var sid:Int;
-    private var x:Int;
-    private var y:Int;
+    public var x:Float;
+    public var y:Float;
+    public var lastX:Float;
+    public var lastY:Float;
+    public var visualX:Float;
+    public var visualY:Float;
+
     private var health:Int;
 
-	public function new(sid:Int, x:Int, y:Int) {
+	public function new(sid:Int, x:Float, y:Float) {
 		this.sid = sid;
         this.x = x;
         this.y = y;
+        this.lastX = x;
+        this.lastY = y;
+        this.visualX = x;
+        this.visualY = y;
 
         this.health = Config.PlayerBaseHealth;
 	}

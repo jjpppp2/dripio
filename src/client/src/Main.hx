@@ -1,17 +1,18 @@
-package client;
+package;
 
-import src.client.src.classes.Render;
-import src.client.src.classes.Game;
+import classes.Render;
+import classes.Game;
 
 class Main {
     public static var instance:Main;
     public var game:Game;
+    public var renderer:Render;
 
     public function new() {
         trace("Bundle loaded.");
 
         game = new Game();
-        final render = new Render();
+        renderer = new Render();
     }
 
     public static function main() {

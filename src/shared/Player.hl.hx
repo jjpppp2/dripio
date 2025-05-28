@@ -1,44 +1,61 @@
 package src.shared;
 
 import src.shared.Config;
+import Math;
 
 class Player {
 	public var sid:Int;
-    private var x:Float;
-    private var y:Float;
-    private var health:Float;
-    private var moveDir:Float;
-    private var xVel:Float;
-    private var yVel:Float;
-    private var speed:Float;
+
+	public var x:Float;
+	public var y:Float;
+
+	private var health:Float;
+
+	public var moveDir:Null<Float>;
+
+	private var xVel:Float;
+	private var yVel:Float;
+	private var speed:Float;
+
+	public var lastX:Float;
+	public var lastY:Float;
+	public var visualX:Float;
+	public var visualY:Float;
 
 	public function new(sid:Int, x:Float, y:Float) {
 		this.sid = sid;
-        this.x = x;
-        this.y = y;
-        this.speed = Config.PlayerBaseSpeed;
+		this.x = x;
+		this.y = y;
+		this.speed = Config.PlayerBaseSpeed;
+		this.moveDir = null;
 
-        this.health = cast Config.PlayerBaseHealth;
+		this.health = cast Config.PlayerBaseHealth;
 	}
 
-    function update() {
-        // update coordinates
-        final xMovement = (this.moveDir ? Math.cos(this.moveDir ?? 0) : null);
-        final yMovement = (this.moveDir ? Math.sin(this.moveDir ?? 0) : null);
+	public function update() {
+		if (moveDir != null) {
+			xVel = Math.cos(moveDir) * speed;
+			yVel = Math.sin(moveDir) * speed;
+		} else {
+			// apply deceleration
+			if (Math.abs(xVel) > 0.01) {
+				xVel *= Config.PlayerDeceleration;
+			} else
+				xVel = 0.0;
 
-        final distanceTraveled = Math.sqrt(xMovement * xMovement + yMovement * yMovement);
+			if (Math.abs(yVel) > 0.01) {
+				yVel *= Config.PlayerDeceleration;
+			} else
+				yVel = 0.0;
+		}
 
-        // apply acceleration
-        this.xVel += distanceTraveled * Math.cos(this.moveDir ?? 0);
-        this.yVel += distanceTraveled * Math.sin(this.moveDir ?? 0);
+		// xVel *= (1000 / 110);
+		// yVel *= (1000 / 110);
 
-        // apply deceleration
-        if(this.xVel > 0.01) {
-            this.xVel *= Config.PlayerDeceleration;
-        } else this.xVel = 0.0;
+		x += xVel;
+		y += yVel;
 
-        if(this.yVel > 0.01) {
-            this.yVel *= Config.PlayerDeceleration;
-        } else this.yVel = 0.0;
-    }
+		x = Math.max(0, Math.min(x, Config.MapSize));
+		y = Math.max(0, Math.min(y, Config.MapSize));
+	}
 }

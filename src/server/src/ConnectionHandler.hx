@@ -1,17 +1,24 @@
 package;
 
+import packets.OutgoingPackets;
 import hx.ws.SocketImpl;
 import hx.ws.WebSocketHandler;
 import hx.ws.Types;
 import haxe.io.Bytes;
 import org.msgpack.MsgPack;
+import packets.IncomingPackets;
+import classes.WebSocket;
 
 class ConnectionHandler extends WebSocketHandler {
 	public function new(s:SocketImpl) {
 		super(s);
+		var wss = new WebSocket(s);
+		wss.send = send;
 
 		onopen = function() {
 			trace(id + ". OPEN");
+
+			//send(MsgPack.encode([OutgoingPackets.Ping.getName()]));
 		}
 
 		onclose = function() {
@@ -21,17 +28,26 @@ class ConnectionHandler extends WebSocketHandler {
 		onmessage = function(message:MessageType) {
 			switch (message) {
 				case BytesMessage(buffer):
-
 					// figure out way to simplify later (no clue what its doing)
-					var bytesList = new haxe.io.BytesBuffer();
+					/*var bytesList = new haxe.io.BytesBuffer();
 					while (buffer.available > 0) {
 						var b = buffer.readByte();
 						bytesList.addByte(b);
 					}
-					var bytes = bytesList.getBytes();
-					var data = MsgPack.decode(bytes);
+					var bytes = bytesList.getBytes();*/
+					var data = MsgPack.decode(buffer.readAllAvailableBytes());
 
-					trace(data);
+					final packet = parseIncomingPacket(cast data[0], cast data[1]);
+					switch (packet) {
+						case Spawn(data):
+							Server.core.newPlayer(data[0], wss);
+						
+						case Move(data):
+							Server.core.setMoveDir(wss, data[0]);
+						
+						case _:
+							trace("useless");
+					}
 				case StrMessage(content):
 					trace("what?? " + content);
 			}

@@ -3,3 +3,5 @@
 -hl src/server/bin/server.hl
 -lib hxWebSockets
 -lib msgpack-haxe
+-lib logshim
+#-lib haxe-concurrent

@@ -1,4 +1,4 @@
-package src.client.src.packets;
+package packets;
 
 import haxe.io.Bytes;
 import org.msgpack.MsgPack;
@@ -6,28 +6,24 @@ import org.msgpack.MsgPack;
 enum IncomingPackets {
 	AddPlayer(data:Array<Dynamic>);
 	AddBuilding(data:Array<Dynamic>);
-    UpdatePlayers(data:Array<Dynamic>);
-    Ping();
+	UpdatePlayers(data:Array<Dynamic>);
+	Ping;
 }
 
 class PacketData {
-	public var type: String;
-	public var data: Map<String, Dynamic>;
+	public var type:String;
+	public var data:Map<String, Dynamic>;
 
 	public function new() {}
 }
 
-function decodePacket(packet: Bytes): IncomingPackets {
-    final p: Dynamic = MsgPack.decode(packet);
-
-    final type = Reflect.field(p, "type");
-    final data = Reflect.field(p, "data");
-
-    return switch (type) {
-        case "AddPlayer": IncomingPackets.AddPlayer(data);
-        case "AddBuilding": IncomingPackets.AddBuilding(data);
-        case "UpdatePlayers": IncomingPackets.UpdatePlayers(data);
-        case "Ping": IncomingPackets.Ping;
-        case _: throw "unknown packet type";
-    }
+function parseIncomingPacket(type:String, data:Array<Dynamic>):IncomingPackets {
+	switch (type) {
+		case "AddPlayer": return IncomingPackets.AddPlayer(data);
+		case "AddBuilding": return IncomingPackets.AddBuilding(data);
+		case "UpdatePlayers": return IncomingPackets.UpdatePlayers(data);
+		case "Ping": return IncomingPackets.Ping;
+		case _:
+			throw "unknown packet type";
+	}
 }

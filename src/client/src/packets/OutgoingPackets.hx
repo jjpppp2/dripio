@@ -1,4 +1,4 @@
-package src.client.src.packets;
+package packets;
 
 import org.msgpack.MsgPack;
 import haxe.io.Bytes;
@@ -7,7 +7,7 @@ enum OutgoingPackets {
     Spawn;
     ChatMessage(data:Array<Dynamic>);
     Aim(data:Array<Dynamic>);
-    Move(data:Array<Dynamic>);
+    Move;
     Ping();
 }
 

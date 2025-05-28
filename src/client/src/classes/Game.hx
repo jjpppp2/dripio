@@ -1,21 +1,24 @@
-package src.client.src.classes;
+package classes;
 
-import src.client.src.packets.IncomingPackets;
-import src.client.src.packets.OutgoingPackets;
+import src.shared.Player;
+import org.msgpack.MsgPack;
+import haxe.Timer;
+import packets.IncomingPackets;
+import packets.OutgoingPackets;
 import hx.ws.Types.MessageType;
-import haxe.io.Bytes;
 import haxe.io.Bytes;
 import hx.ws.Log;
 import hx.ws.WebSocket;
+import classes.PlayerManager;
+import Log;
 
 class Game {
 	public var ws:WebSocket;
-	// public var players:Array<Player>;
-	// public var myPlayer:Player;
+	public var playerManager:PlayerManager;
 	public var timeSinceGameUpdate:Float;
 
 	public function new() {
-		Log.mask = Log.INFO | Log.DEBUG | Log.DATA;
+		// Log.mask = Log.INFO | Log.DEBUG | Log.DATA;
 		this.ws = new WebSocket("ws://localhost:5000"); // ("wss://quiver-descriptive-sight.glitch.me");
 		this.ws.binaryType = cast "arraybuffer";
 
@@ -23,44 +26,62 @@ class Game {
 		this.ws.onmessage = this.onmessage;
 		this.ws.onerror = this.onerror;
 		this.ws.onclose = this.onclose;
+
+		playerManager = new PlayerManager();
+
+		Log.info("Initializing Bundle.");
 	}
 
 	private function onopen() {
-		trace("WS OPENED");
+		Log.info("Connected to game server.");
 
-		sendPacket(OutgoingPackets.Spawn, ["ok"]);
-		sendPacket(OutgoingPackets.Spawn, ["ok"]);
-		sendPacket(OutgoingPackets.Spawn, ["ok"]);
-		sendPacket(OutgoingPackets.Spawn, ["ok"]);
 		sendPacket(OutgoingPackets.Spawn, ["ok"]);
 	}
 
 	private function onerror(error:String) {
-		//alert('Error encountered while trying to connect to the game. Try reloading.');
+		Log.error('Error while connecting to game server: $error');
+		// alert('Error encountered while trying to connect to the game. Try reloading.');
 	}
 
 	private function onclose() {}
 
 	private function onmessage(msg:MessageType) {
 		switch (msg) {
-			case BytesMessage(data):
-				final bytes:haxe.io.Bytes = cast data;
-				final args = decodePacket(bytes);
-
-				switch (args) {
-					case Ping:
-						this.Packets_Ping();
-					case _:
-						trace("unknown packet inbound!!");
+			case BytesMessage(buffer):
+				var bytesList = new haxe.io.BytesBuffer();
+				while (buffer.available > 0) {
+					var b = buffer.readByte();
+					bytesList.addByte(b);
 				}
-			
-			case StrMessage(text):
-				trace("waht????" + text);
-		}
-		
-	}
+				var bytes = bytesList.getBytes();
+				var data = MsgPack.decode(bytes);
 
-	private function Packets_Ping() {
-		trace("WOAHHHHHHHHH PING PACKET SO COOL!!!");
+				final packet = parseIncomingPacket(cast data[0], cast data[1]);
+				switch (packet) {
+					case AddPlayer(data):
+						final args = data[0];
+
+						final chunkSize = 8;
+						var i = 0;
+
+						while (i < args[1].length) {
+							final chunk = args[1].slice(i, i + chunkSize);
+
+							final player = new Player(args[1][i], args[1][i + 1], args[1][i + 2]);
+							playerManager.addPlayer(player, cast args[0]);
+							trace(args[0]);
+
+							i += chunkSize;
+						}
+					
+					case UpdatePlayers(data):
+						playerManager.updatePlayers(data[0]);
+
+					case _: trace("useless");
+				}
+
+			case StrMessage(content):
+				trace(content);
+		}
 	}
 }
